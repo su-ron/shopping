@@ -1,5 +1,6 @@
 // 产品模型
 const { db } = require('../database/connection');
+const ProductImage = require('./ProductImage');
 
 class Product {
     // 创建产品
@@ -40,17 +41,33 @@ class Product {
     }
 
     // 根据ID查找产品
-    static async findById(id) {
+    static async findById(id, includeImages = false) {
         const sql = 'SELECT * FROM product_details WHERE id = ?';
         const [products] = await db.query(sql, [id]);
-        return products[0] || null;
+        const product = products[0] || null;
+
+        if (product && includeImages) {
+            product.images = await ProductImage.findByProductId(id);
+            product.carousel_images = await ProductImage.getCarouselImages(id);
+            product.thumbnail = await ProductImage.getThumbnail(id);
+        }
+
+        return product;
     }
 
     // 根据slug查找产品
-    static async findBySlug(slug) {
+    static async findBySlug(slug, includeImages = false) {
         const sql = 'SELECT * FROM product_details WHERE slug = ?';
         const [products] = await db.query(sql, [slug]);
-        return products[0] || null;
+        const product = products[0] || null;
+
+        if (product && includeImages) {
+            product.images = await ProductImage.findByProductId(product.id);
+            product.carousel_images = await ProductImage.getCarouselImages(product.id);
+            product.thumbnail = await ProductImage.getThumbnail(product.id);
+        }
+
+        return product;
     }
 
     // 更新产品
@@ -180,6 +197,13 @@ class Product {
         const dataParams = [...params, limit, offset];
         const products = await db.query(dataSql, dataParams);
 
+        // 如果需要包含图片，为每个产品获取缩略图
+        if (filters.include_images) {
+            for (const product of products) {
+                product.thumbnail = await ProductImage.getThumbnail(product.id);
+            }
+        }
+
         return {
             products,
             pagination: {
@@ -248,6 +272,13 @@ class Product {
         const dataParams = [...params, searchTerm, searchTerm, searchTerm, limit, offset];
         const products = await db.query(dataSql, dataParams);
 
+        // 如果需要包含图片，为每个产品获取缩略图
+        if (filters.include_images) {
+            for (const product of products) {
+                product.thumbnail = await ProductImage.getThumbnail(product.id);
+            }
+        }
+
         // 记录搜索历史（如果有用户ID）
         if (filters.user_id && query) {
             await this.recordSearchHistory(filters.user_id, query, total);
@@ -289,7 +320,7 @@ class Product {
     }
 
     // 获取推荐产品
-    static async getRecommendedProducts(userId = null, limit = 10) {
+    static async getRecommendedProducts(userId = null, limit = 10, includeImages = false) {
         let sql;
         let params;
 
@@ -325,11 +356,20 @@ class Product {
             params = [limit];
         }
 
-        return await db.query(sql, params);
+        const products = await db.query(sql, params);
+
+        // 如果需要包含图片，为每个产品获取缩略图
+        if (includeImages) {
+            for (const product of products) {
+                product.thumbnail = await ProductImage.getThumbnail(product.id);
+            }
+        }
+
+        return products;
     }
 
     // 获取相关产品
-    static async getRelatedProducts(productId, limit = 8) {
+    static async getRelatedProducts(productId, limit = 8, includeImages = false) {
         const product = await this.findById(productId);
         if (!product) return [];
 
@@ -344,7 +384,16 @@ class Product {
             LIMIT ?
         `;
 
-        return await db.query(sql, [product.category_id, productId, limit]);
+        const products = await db.query(sql, [product.category_id, productId, limit]);
+
+        // 如果需要包含图片，为每个产品获取缩略图
+        if (includeImages) {
+            for (const product of products) {
+                product.thumbnail = await ProductImage.getThumbnail(product.id);
+            }
+        }
+
+        return products;
     }
 
     // 更新库存

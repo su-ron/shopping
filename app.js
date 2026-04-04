@@ -16,6 +16,8 @@ const cartRoutes = require('./routes/cartRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const imageRoutes = require('./routes/imageRoutes');
+const searchRoutes = require('./routes/searchRoutes');
 
 // 创建Express应用
 const app = express();
@@ -38,6 +40,8 @@ applySecurityMiddleware(app);
 
 // 静态文件服务
 app.use(express.static(path.join(__dirname)));
+// 上传文件静态服务
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 请求日志中间件（安全增强版）
 app.use((req, res, next) => {
@@ -61,6 +65,8 @@ app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api', imageRoutes);
+app.use('/api/search', searchRoutes);
 
 // 健康检查端点
 app.get('/api/health', (req, res) => {
