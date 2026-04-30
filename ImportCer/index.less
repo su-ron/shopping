@@ -49,6 +49,40 @@
       color: #ffffff;
     }
 
+    .form-input-number {
+      width: 100%;
+      height: 32px;
+
+      &.ant-input-number {
+        background-color: transparent;
+        border: 1px solid #ffffff;
+      }
+
+      &.ant-input-number-focused {
+        border-color: var(--primary-color);
+      }
+
+      .ant-input-number-input {
+        height: 30px;
+        color: #ffffff;
+        background-color: transparent;
+      }
+
+      .ant-input-number-handler-wrap {
+        background: rgba(255, 255, 255, 0.1);
+        border-left: 1px solid rgba(255, 255, 255, 0.2);
+
+        .ant-input-number-handler {
+          border-color: rgba(255, 255, 255, 0.2);
+
+          .ant-input-number-handler-up-inner,
+          .ant-input-number-handler-down-inner {
+            color: #ffffff !important;
+          }
+        }
+      }
+    }
+
     .form-path-input {
       flex: 1;
       min-width: 0;

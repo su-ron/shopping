@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Input, Button, Popover, message } from 'antd';
+import { Input, InputNumber, Button, Popover, message } from 'antd';
 import { getMessage } from '../../../resource/ProjectMgmtBundle';
 import helpDefault from '../../icon/help.png';
 import fileChooser from '../../icon/filechooser.png';
@@ -20,7 +20,7 @@ interface CertificateForm {
   password: string;
   confirmPassword: string;
   keyAlias: string;
-  validity: string;
+  validity: number | undefined;
   firstName: string;
   orgUnit: string;
   organization: string;
@@ -95,7 +95,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     password: '',
     confirmPassword: '',
     keyAlias: '',
-    validity: '',
+    validity: undefined,
     firstName: '',
     orgUnit: '',
     organization: '',
@@ -113,7 +113,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
   // ======================
   // 更新字段并清除对应错误
   // ======================
-  const updateField = (key: keyof CertificateForm, value: string): void => {
+  const updateField = (key: keyof CertificateForm, value: string | number | undefined): void => {
     setForm(prev => ({ ...prev, [key]: value }));
     if (errors[key as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [key]: undefined }));
@@ -198,9 +198,9 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
         break;
       }
       case 'validity': {
-        if (!form.validity) {
+        if (form.validity === undefined || form.validity === null) {
           error = getMessage('uploadProduct.importCer.error.validityRequired');
-        } else if (!/^\d+$/.test(form.validity) || parseInt(form.validity) <= 0) {
+        } else if (!Number.isInteger(form.validity) || form.validity <= 0) {
           error = getMessage('uploadProduct.importCer.error.validityFormat');
         }
         break;
@@ -468,12 +468,12 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               <div className="form-row">
                 <FormLabel required>{getMessage('uploadProduct.importCer.label.validity')}</FormLabel>
                 <div className="form-right">
-                  <Input
-                    className="form-input"
-                    type="number"
+                  <InputNumber
+                    className="form-input-number"
                     min={1}
+                    max={100}
                     value={form.validity}
-                    onChange={e => updateField('validity', e.target.value)}
+                    onChange={value => updateField('validity', value ?? undefined)}
                     onBlur={() => handleBlur('validity')}
                     status={errors.validity ? 'error' : undefined}
                   />
