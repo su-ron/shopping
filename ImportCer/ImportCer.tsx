@@ -365,20 +365,23 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <input
-                  type="text"
-                  className="form-path-input"
-                  value={form.p12Path}
-                  onChange={e => updateField('p12Path', e.target.value)}
-                  onBlur={() => handleBlur('p12Path')}
-                  placeholder=""
-                />
-                <img
-                  src={fileChooserImg}
-                  className="file-icon"
-                  onClick={() => p12FileRef.current?.click()}
-                  alt="choose file"
-                />
+                <div className="input-icon-wrapper">
+                  <input
+                    type="text"
+                    className="form-path-input"
+                    value={form.p12Path}
+                    onChange={e => updateField('p12Path', e.target.value)}
+                    onBlur={() => handleBlur('p12Path')}
+                    placeholder=""
+                  />
+                  <img
+                    src={fileChooserImg}
+                    className="file-icon"
+                    onClick={() => p12FileRef.current?.click()}
+                    alt="choose file"
+                  />
+                </div>
+                <HelpIcon helpKey="__none__" />
               </div>
               <div className="path-hint">
                 {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.p12Path || ''}
@@ -445,19 +448,21 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <Input
-                  className="form-input"
-                  value={form.keyAlias}
-                  onChange={e => updateField('keyAlias', e.target.value)}
-                  onBlur={() => handleBlur('keyAlias')}
-                  status={errors.keyAlias ? 'error' : undefined}
-                />
-                <img
-                  src={fileChooserImg}
-                  className="file-icon"
-                  onClick={() => p12FileRef.current?.click()}
-                  alt="choose file"
-                />
+                <div className="input-icon-wrapper">
+                  <Input
+                    className="form-input"
+                    value={form.keyAlias}
+                    onChange={e => updateField('keyAlias', e.target.value)}
+                    onBlur={() => handleBlur('keyAlias')}
+                    status={errors.keyAlias ? 'error' : undefined}
+                  />
+                  <img
+                    src={fileChooserImg}
+                    className="file-icon"
+                    onClick={() => p12FileRef.current?.click()}
+                    alt="choose file"
+                  />
+                </div>
                 <HelpIcon helpKey="keyAlias" />
               </div>
             </div>
@@ -631,20 +636,23 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <input
-                  type="text"
-                  className="form-path-input"
-                  value={form.csrPath}
-                  onChange={e => updateField('csrPath', e.target.value)}
-                  onBlur={() => handleBlur('csrPath')}
-                  placeholder=""
-                />
-                <img
-                  src={fileChooserImg}
-                  className="file-icon"
-                  onClick={() => csrFileRef.current?.click()}
-                  alt="choose file"
-                />
+                <div className="input-icon-wrapper">
+                  <input
+                    type="text"
+                    className="form-path-input"
+                    value={form.csrPath}
+                    onChange={e => updateField('csrPath', e.target.value)}
+                    onBlur={() => handleBlur('csrPath')}
+                    placeholder=""
+                  />
+                  <img
+                    src={fileChooserImg}
+                    className="file-icon"
+                    onClick={() => csrFileRef.current?.click()}
+                    alt="choose file"
+                  />
+                </div>
+                <HelpIcon helpKey="__none__" />
               </div>
               <div className="path-hint">
                 {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.csrPath || ''}
