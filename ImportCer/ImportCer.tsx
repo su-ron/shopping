@@ -312,18 +312,22 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     </span>
   );
 
+  // 统一帮助图标组件：无内容时渲染占位符以保持对齐
   const HelpIcon = ({ helpKey }: { helpKey: string }) => {
     const help = HELP_CONTENT[helpKey];
-    if (!help) return null;
     return (
-      <Popover
-        title={help.title}
-        content={help.content}
-        trigger="hover"
-        placement="right"
-      >
-        <img src={helpImg} className="help-icon" alt="help" />
-      </Popover>
+      <span className={`help-icon-wrapper ${!help ? 'help-icon-placeholder' : ''}`}>
+        {help && (
+          <Popover
+            title={help.title}
+            content={help.content}
+            trigger="hover"
+            placement="right"
+          >
+            <img src={helpImg} className="help-icon" alt="help" />
+          </Popover>
+        )}
+      </span>
     );
   };
 
@@ -395,14 +399,17 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
         <div className="form-row">
           <FormLabel required>{getMessage('uploadProduct.importCer.label.keyStorePassword')}</FormLabel>
           <div className="form-right">
-            <Input.Password
-              className="form-input"
-              value={form.password}
-              onChange={e => updateField('password', e.target.value)}
-              onBlur={() => handleBlur('password')}
-              status={errors.password ? 'error' : undefined}
-              iconRender={() => null}
-            />
+            <div className="form-line">
+              <Input.Password
+                className="form-input"
+                value={form.password}
+                onChange={e => updateField('password', e.target.value)}
+                onBlur={() => handleBlur('password')}
+                status={errors.password ? 'error' : undefined}
+                iconRender={() => null}
+              />
+              <HelpIcon helpKey="__none__" />
+            </div>
             {errors.password && <div className="field-error">{errors.password}</div>}
           </div>
         </div>
@@ -411,14 +418,17 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
         <div className="form-row">
           <FormLabel required>{getMessage('uploadProduct.importCer.label.confirmPassword')}</FormLabel>
           <div className="form-right">
-            <Input.Password
-              className="form-input"
-              value={form.confirmPassword}
-              onChange={e => updateField('confirmPassword', e.target.value)}
-              onBlur={() => handleBlur('confirmPassword')}
-              status={errors.confirmPassword ? 'error' : undefined}
-              iconRender={() => null}
-            />
+            <div className="form-line">
+              <Input.Password
+                className="form-input"
+                value={form.confirmPassword}
+                onChange={e => updateField('confirmPassword', e.target.value)}
+                onBlur={() => handleBlur('confirmPassword')}
+                status={errors.confirmPassword ? 'error' : undefined}
+                iconRender={() => null}
+              />
+              <HelpIcon helpKey="__none__" />
+            </div>
             {errors.confirmPassword && <div className="field-error">{errors.confirmPassword}</div>}
           </div>
         </div>
@@ -429,8 +439,8 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <span className="key-separator-line" />
         </div>
 
-        {/* Alias (outside Advance Setting) */}
-        <div className="form-row">
+        {/* Alias — 缩进3个字节 */}
+        <div className="form-row indent-3">
           <FormLabel required>{getMessage('uploadProduct.importCer.label.keyAlias')}</FormLabel>
           <div className="form-right">
             <div className="file-input-wrapper">
@@ -460,6 +470,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="advance-header" onClick={toggleAdvance}>
             <span className={`advance-arrow ${advanceOpen ? 'open' : ''}`}>{advanceOpen ? '▼' : '▶'}</span>
             <span className="advance-title">{getMessage('uploadProduct.importCer.advanceSetting')}</span>
+            <span className="advance-header-line" />
           </div>
 
           {advanceOpen && (
@@ -468,15 +479,18 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               <div className="form-row">
                 <FormLabel required>{getMessage('uploadProduct.importCer.label.validity')}</FormLabel>
                 <div className="form-right">
-                  <InputNumber
-                    className="form-input-number"
-                    min={1}
-                    max={100}
-                    value={form.validity}
-                    onChange={value => updateField('validity', value ?? undefined)}
-                    onBlur={() => handleBlur('validity')}
-                    status={errors.validity ? 'error' : undefined}
-                  />
+                  <div className="form-line">
+                    <InputNumber
+                      className="form-input-number"
+                      min={1}
+                      max={100}
+                      value={form.validity}
+                      onChange={value => updateField('validity', value ?? undefined)}
+                      onBlur={() => handleBlur('validity')}
+                      status={errors.validity ? 'error' : undefined}
+                    />
+                    <HelpIcon helpKey="__none__" />
+                  </div>
                   {errors.validity && <div className="field-error">{errors.validity}</div>}
                 </div>
               </div>
@@ -575,14 +589,17 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               <div className="form-row">
                 <FormLabel required>{getMessage('uploadProduct.importCer.label.countryCode')}</FormLabel>
                 <div className="form-right">
-                  <Input
-                    className="form-input"
-                    value={form.countryCode}
-                    onChange={e => updateField('countryCode', e.target.value)}
-                    onBlur={() => handleBlur('countryCode')}
-                    status={errors.countryCode ? 'error' : undefined}
-                    maxLength={2}
-                  />
+                  <div className="form-line">
+                    <Input
+                      className="form-input"
+                      value={form.countryCode}
+                      onChange={e => updateField('countryCode', e.target.value)}
+                      onBlur={() => handleBlur('countryCode')}
+                      status={errors.countryCode ? 'error' : undefined}
+                      maxLength={2}
+                    />
+                    <HelpIcon helpKey="__none__" />
+                  </div>
                   {errors.countryCode && <div className="field-error">{errors.countryCode}</div>}
                 </div>
               </div>
