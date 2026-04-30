@@ -1,0 +1,251 @@
+.import-cer-container {
+  padding: 24px;
+  background: var(--bg-color);
+  border-radius: 8px;
+
+  display: flex;
+  flex-direction: column;
+
+  height: 100%;
+}
+
+.form-section {
+  flex: 1;
+
+  .form-row {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    gap: 4px;
+
+    .form-label {
+      width: 200px;
+      text-align: left;
+      padding-right: 4px;
+      flex-shrink: 0;
+      font-size: 12px;
+      color: var(--text-secondary-color);
+    }
+
+    .form-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-line {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .form-input {
+      flex: 1;
+      height: 32px;
+      box-sizing: border-box;
+      background-color: transparent;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+    }
+
+    .form-path-input {
+      flex: 1;
+      min-width: 0;
+
+      height: 32px;
+      padding: 0 36px 0 12px;
+
+      background-color: transparent;
+      box-sizing: border-box;
+      border: 1px solid #ffffff;
+      color: #ffffff;
+    }
+
+    .help-icon {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .file-icon {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+  }
+
+  .field-error {
+    font-size: 12px;
+    color: var(--error-color, #ff4d4f);
+    line-height: 1.4;
+  }
+}
+
+/* ================= Key Separator ================= */
+.key-separator {
+  display: flex;
+  align-items: center;
+  margin: 24px 0;
+  gap: 12px;
+
+  .key-separator-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary-color);
+    white-space: nowrap;
+  }
+
+  .key-separator-line {
+    flex: 1;
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+/* ================= Advance Setting ================= */
+.advance-setting {
+  margin-bottom: 16px;
+
+  .advance-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 8px 0;
+    user-select: none;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    .advance-arrow {
+      font-size: 10px;
+      color: var(--text-secondary-color);
+      transition: transform 0.2s;
+
+      &.open {
+        transform: rotate(0deg);
+      }
+    }
+
+    .advance-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--primary-color, #1890ff);
+    }
+  }
+
+  .advance-body {
+    padding: 16px 0 0 24px;
+    border-top: none;
+  }
+}
+
+/* ================= Footer ================= */
+.footer-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+
+.file-icon:hover {
+  opacity: 1;
+}
+
+.help-tooltip {
+  .help-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--bg-secondary-color);
+    color: var(--text-secondary-color);
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover {
+      background: var(--primary-color);
+      color: #fff;
+    }
+
+    .help-img {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+}
+
+.help-content {
+  .help-section {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .help-title {
+      font-weight: 500;
+      font-size: 13px;
+      color: var(--text-primary-color);
+      margin-bottom: 8px;
+    }
+  }
+}
+
+.required-star {
+  color: red;
+  margin-right: 4px;
+}
+
+.left-align {
+  text-align: left;
+  width: 100%;
+}
+
+.import-cer-title-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.import-cer-title {
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary-color);
+}
+
+.title-line {
+  flex: 1;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin-left: 12px;
+}
+
+.ant-input-password-icon {
+  display: none !important;
+}
+
+.file-input-wrapper {
+  position: relative;
+  width: 100%;
+}
