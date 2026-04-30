@@ -20,6 +20,13 @@ interface CertificateForm {
   password: string;
   confirmPassword: string;
   keyAlias: string;
+  validity: string;
+  firstName: string;
+  orgUnit: string;
+  organization: string;
+  city: string;
+  province: string;
+  countryCode: string;
   CSRName: string;
   csrPath: string;
 }
@@ -30,6 +37,13 @@ interface FormErrors {
   password?: string;
   confirmPassword?: string;
   keyAlias?: string;
+  validity?: string;
+  firstName?: string;
+  orgUnit?: string;
+  organization?: string;
+  city?: string;
+  province?: string;
+  countryCode?: string;
   CSRName?: string;
   csrPath?: string;
 }
@@ -47,6 +61,26 @@ const HELP_CONTENT: Record<string, { title: string; content: string }> = {
     title: getMessage('uploadProduct.importCer.help.csrFile.title'),
     content: getMessage('uploadProduct.importCer.help.csrFile.content'),
   },
+  firstName: {
+    title: getMessage('uploadProduct.importCer.help.firstName.title'),
+    content: getMessage('uploadProduct.importCer.help.firstName.content'),
+  },
+  orgUnit: {
+    title: getMessage('uploadProduct.importCer.help.orgUnit.title'),
+    content: getMessage('uploadProduct.importCer.help.orgUnit.content'),
+  },
+  organization: {
+    title: getMessage('uploadProduct.importCer.help.organization.title'),
+    content: getMessage('uploadProduct.importCer.help.organization.content'),
+  },
+  city: {
+    title: getMessage('uploadProduct.importCer.help.city.title'),
+    content: getMessage('uploadProduct.importCer.help.city.content'),
+  },
+  province: {
+    title: getMessage('uploadProduct.importCer.help.province.title'),
+    content: getMessage('uploadProduct.importCer.help.province.content'),
+  },
 };
 
 export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
@@ -61,6 +95,13 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     password: '',
     confirmPassword: '',
     keyAlias: '',
+    validity: '',
+    firstName: '',
+    orgUnit: '',
+    organization: '',
+    city: '',
+    province: '',
+    countryCode: '',
     CSRName: '',
     csrPath: '',
   });
@@ -156,6 +197,48 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
         }
         break;
       }
+      case 'validity': {
+        if (!form.validity) {
+          error = getMessage('uploadProduct.importCer.error.validityRequired');
+        } else if (!/^\d+$/.test(form.validity) || parseInt(form.validity) <= 0) {
+          error = getMessage('uploadProduct.importCer.error.validityFormat');
+        }
+        break;
+      }
+      case 'firstName':
+        if (!form.firstName) {
+          error = getMessage('uploadProduct.importCer.error.firstNameRequired');
+        }
+        break;
+      case 'orgUnit':
+        if (!form.orgUnit) {
+          error = getMessage('uploadProduct.importCer.error.orgUnitRequired');
+        }
+        break;
+      case 'organization':
+        if (!form.organization) {
+          error = getMessage('uploadProduct.importCer.error.organizationRequired');
+        }
+        break;
+      case 'city':
+        if (!form.city) {
+          error = getMessage('uploadProduct.importCer.error.cityRequired');
+        }
+        break;
+      case 'province':
+        if (!form.province) {
+          error = getMessage('uploadProduct.importCer.error.provinceRequired');
+        }
+        break;
+      case 'countryCode': {
+        const value = form.countryCode;
+        if (!value) {
+          error = getMessage('uploadProduct.importCer.error.countryCodeRequired');
+        } else if (!/^[A-Z]{2}$/.test(value)) {
+          error = getMessage('uploadProduct.importCer.error.countryCodeFormat');
+        }
+        break;
+      }
       case 'CSRName':
         if (!form.CSRName) {
           error = getMessage('uploadProduct.importCer.error.csrNameRequired');
@@ -182,7 +265,9 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
   const validateForm = (): boolean => {
     const fields: (keyof FormErrors)[] = [
       'p12Name', 'p12Path', 'password', 'confirmPassword',
-      'keyAlias', 'CSRName', 'csrPath',
+      'keyAlias', 'validity', 'firstName', 'orgUnit',
+      'organization', 'city', 'province', 'countryCode',
+      'CSRName', 'csrPath',
     ];
     let isValid = true;
 
@@ -344,6 +429,32 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <span className="key-separator-line" />
         </div>
 
+        {/* Alias (outside Advance Setting) */}
+        <div className="form-row">
+          <FormLabel required>{getMessage('uploadProduct.importCer.label.keyAlias')}</FormLabel>
+          <div className="form-right">
+            <div className="file-input-wrapper">
+              <div className="form-line">
+                <Input
+                  className="form-input"
+                  value={form.keyAlias}
+                  onChange={e => updateField('keyAlias', e.target.value)}
+                  onBlur={() => handleBlur('keyAlias')}
+                  status={errors.keyAlias ? 'error' : undefined}
+                />
+                <img
+                  src={fileChooserImg}
+                  className="file-icon"
+                  onClick={() => p12FileRef.current?.click()}
+                  alt="choose file"
+                />
+                <HelpIcon helpKey="keyAlias" />
+              </div>
+            </div>
+            {errors.keyAlias && <div className="field-error">{errors.keyAlias}</div>}
+          </div>
+        </div>
+
         {/* ================= ADVANCE SETTING ================= */}
         <div className="advance-setting">
           <div className="advance-header" onClick={toggleAdvance}>
@@ -353,87 +464,184 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
           {advanceOpen && (
             <div className="advance-body">
-              {/* Alias */}
+              {/* Validity(years) */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.keyAlias')}</FormLabel>
+                <FormLabel required>{getMessage('uploadProduct.importCer.label.validity')}</FormLabel>
                 <div className="form-right">
-                  <div className="file-input-wrapper">
-                    <div className="form-line">
-                      <Input
-                        className="form-input"
-                        value={form.keyAlias}
-                        onChange={e => updateField('keyAlias', e.target.value)}
-                        onBlur={() => handleBlur('keyAlias')}
-                        status={errors.keyAlias ? 'error' : undefined}
-                      />
-                      <img
-                        src={fileChooserImg}
-                        className="file-icon"
-                        onClick={() => csrFileRef.current?.click()}
-                        alt="choose file"
-                      />
-                      <HelpIcon helpKey="keyAlias" />
-                    </div>
-                  </div>
-                  {errors.keyAlias && <div className="field-error">{errors.keyAlias}</div>}
+                  <Input
+                    className="form-input"
+                    type="number"
+                    min={1}
+                    value={form.validity}
+                    onChange={e => updateField('validity', e.target.value)}
+                    onBlur={() => handleBlur('validity')}
+                    status={errors.validity ? 'error' : undefined}
+                  />
+                  {errors.validity && <div className="field-error">{errors.validity}</div>}
                 </div>
               </div>
 
-              {/* CSR file (*.csr) */}
+              {/* First and last name */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.csrFile')}</FormLabel>
+                <FormLabel required>{getMessage('uploadProduct.importCer.label.firstName')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
                     <Input
                       className="form-input"
-                      value={form.CSRName}
-                      onChange={e => updateField('CSRName', e.target.value)}
-                      onBlur={() => handleBlur('CSRName')}
-                      status={errors.CSRName ? 'error' : undefined}
+                      value={form.firstName}
+                      onChange={e => updateField('firstName', e.target.value)}
+                      onBlur={() => handleBlur('firstName')}
+                      status={errors.firstName ? 'error' : undefined}
                     />
-                    <HelpIcon helpKey="csrFile" />
+                    <HelpIcon helpKey="firstName" />
                   </div>
-                  {errors.CSRName && <div className="field-error">{errors.CSRName}</div>}
+                  {errors.firstName && <div className="field-error">{errors.firstName}</div>}
                 </div>
               </div>
 
-              {/* CSR file save path */}
+              {/* Organizational unit */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.csrSavePath')}</FormLabel>
+                <FormLabel required>{getMessage('uploadProduct.importCer.label.orgUnit')}</FormLabel>
                 <div className="form-right">
-                  <div className="file-input-wrapper">
-                    <div className="form-line">
-                      <input
-                        type="text"
-                        className="form-path-input"
-                        value={form.csrPath}
-                        onChange={e => updateField('csrPath', e.target.value)}
-                        onBlur={() => handleBlur('csrPath')}
-                        placeholder=""
-                      />
-                      <img
-                        src={fileChooserImg}
-                        className="file-icon"
-                        onClick={() => csrFileRef.current?.click()}
-                        alt="choose file"
-                      />
-                    </div>
-                    <div className="path-hint">
-                      {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.csrPath || ''}
-                    </div>
+                  <div className="form-line">
+                    <Input
+                      className="form-input"
+                      value={form.orgUnit}
+                      onChange={e => updateField('orgUnit', e.target.value)}
+                      onBlur={() => handleBlur('orgUnit')}
+                      status={errors.orgUnit ? 'error' : undefined}
+                    />
+                    <HelpIcon helpKey="orgUnit" />
                   </div>
-                  <input
-                    ref={csrFileRef}
-                    type="file"
-                    accept=".csr"
-                    style={{ display: 'none' }}
-                    onChange={handleSelectCSR}
+                  {errors.orgUnit && <div className="field-error">{errors.orgUnit}</div>}
+                </div>
+              </div>
+
+              {/* Organization */}
+              <div className="form-row">
+                <FormLabel required>{getMessage('uploadProduct.importCer.label.organization')}</FormLabel>
+                <div className="form-right">
+                  <div className="form-line">
+                    <Input
+                      className="form-input"
+                      value={form.organization}
+                      onChange={e => updateField('organization', e.target.value)}
+                      onBlur={() => handleBlur('organization')}
+                      status={errors.organization ? 'error' : undefined}
+                    />
+                    <HelpIcon helpKey="organization" />
+                  </div>
+                  {errors.organization && <div className="field-error">{errors.organization}</div>}
+                </div>
+              </div>
+
+              {/* City or locality */}
+              <div className="form-row">
+                <FormLabel required>{getMessage('uploadProduct.importCer.label.city')}</FormLabel>
+                <div className="form-right">
+                  <div className="form-line">
+                    <Input
+                      className="form-input"
+                      value={form.city}
+                      onChange={e => updateField('city', e.target.value)}
+                      onBlur={() => handleBlur('city')}
+                      status={errors.city ? 'error' : undefined}
+                    />
+                    <HelpIcon helpKey="city" />
+                  </div>
+                  {errors.city && <div className="field-error">{errors.city}</div>}
+                </div>
+              </div>
+
+              {/* State or province */}
+              <div className="form-row">
+                <FormLabel required>{getMessage('uploadProduct.importCer.label.province')}</FormLabel>
+                <div className="form-right">
+                  <div className="form-line">
+                    <Input
+                      className="form-input"
+                      value={form.province}
+                      onChange={e => updateField('province', e.target.value)}
+                      onBlur={() => handleBlur('province')}
+                      status={errors.province ? 'error' : undefined}
+                    />
+                    <HelpIcon helpKey="province" />
+                  </div>
+                  {errors.province && <div className="field-error">{errors.province}</div>}
+                </div>
+              </div>
+
+              {/* Country code(XX) */}
+              <div className="form-row">
+                <FormLabel required>{getMessage('uploadProduct.importCer.label.countryCode')}</FormLabel>
+                <div className="form-right">
+                  <Input
+                    className="form-input"
+                    value={form.countryCode}
+                    onChange={e => updateField('countryCode', e.target.value)}
+                    onBlur={() => handleBlur('countryCode')}
+                    status={errors.countryCode ? 'error' : undefined}
+                    maxLength={2}
                   />
-                  {errors.csrPath && <div className="field-error">{errors.csrPath}</div>}
+                  {errors.countryCode && <div className="field-error">{errors.countryCode}</div>}
                 </div>
               </div>
             </div>
           )}
+        </div>
+
+        {/* CSR file (*.csr) — 不属于展开部分 */}
+        <div className="form-row">
+          <FormLabel required>{getMessage('uploadProduct.importCer.label.csrFile')}</FormLabel>
+          <div className="form-right">
+            <div className="form-line">
+              <Input
+                className="form-input"
+                value={form.CSRName}
+                onChange={e => updateField('CSRName', e.target.value)}
+                onBlur={() => handleBlur('CSRName')}
+                status={errors.CSRName ? 'error' : undefined}
+              />
+              <HelpIcon helpKey="csrFile" />
+            </div>
+            {errors.CSRName && <div className="field-error">{errors.CSRName}</div>}
+          </div>
+        </div>
+
+        {/* Select file save path (CSR) */}
+        <div className="form-row">
+          <FormLabel required>{getMessage('uploadProduct.importCer.label.csrSavePath')}</FormLabel>
+          <div className="form-right">
+            <div className="file-input-wrapper">
+              <div className="form-line">
+                <input
+                  type="text"
+                  className="form-path-input"
+                  value={form.csrPath}
+                  onChange={e => updateField('csrPath', e.target.value)}
+                  onBlur={() => handleBlur('csrPath')}
+                  placeholder=""
+                />
+                <img
+                  src={fileChooserImg}
+                  className="file-icon"
+                  onClick={() => csrFileRef.current?.click()}
+                  alt="choose file"
+                />
+              </div>
+              <div className="path-hint">
+                {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.csrPath || ''}
+              </div>
+            </div>
+            <input
+              ref={csrFileRef}
+              type="file"
+              accept=".csr"
+              style={{ display: 'none' }}
+              onChange={handleSelectCSR}
+            />
+            {errors.csrPath && <div className="field-error">{errors.csrPath}</div>}
+          </div>
         </div>
       </div>
 
