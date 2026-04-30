@@ -48,18 +48,24 @@
       align-items: center;
     }
 
-    /* Issue 3: 输入框失焦时边框透明，聚焦时白色 */
     .form-input {
       flex: 1;
       height: 32px;
       box-sizing: border-box;
       background-color: transparent;
-      border: 1px solid transparent;
+      border: 1px solid #ffffff;
       color: #ffffff;
 
-      &:focus,
-      &.ant-input-affix-wrapper-focused {
-        border-color: #ffffff;
+      /* Issue 2: 确保原生 input 背景透明，失焦时不会变白 */
+      input.ant-input {
+        background-color: transparent !important;
+      }
+    }
+
+    /* Ant Design Input.Password 内部 input 背景透明 */
+    .ant-input-affix-wrapper {
+      input.ant-input {
+        background-color: transparent !important;
       }
     }
 
@@ -69,7 +75,7 @@
 
       &.ant-input-number {
         background-color: transparent;
-        border: 1px solid transparent;
+        border: 1px solid #ffffff;
       }
 
       &.ant-input-number-focused {
@@ -80,7 +86,12 @@
       .ant-input-number-input {
         height: 30px;
         color: #ffffff;
-        background-color: transparent;
+        background-color: transparent !important;
+      }
+
+      /* Ant Design InputNumber 内部 input 背景透明 */
+      input.ant-input-number-input {
+        background-color: transparent !important;
       }
 
       .ant-input-number-handler-wrap {
@@ -107,12 +118,20 @@
 
       background-color: transparent;
       box-sizing: border-box;
-      border: 1px solid transparent;
+      border: 1px solid #ffffff;
       color: #ffffff;
 
       &:focus {
-        border-color: #ffffff;
         outline: none;
+      }
+
+      /* 失焦时背景不变白 */
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:focus {
+        -webkit-box-shadow: 0 0 0 1000px transparent inset;
+        -webkit-text-fill-color: #ffffff;
+        caret-color: #ffffff;
       }
     }
 
