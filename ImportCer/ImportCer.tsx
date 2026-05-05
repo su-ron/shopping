@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { Input, InputNumber, Button, Popover, message } from 'antd';
 import { getMessage } from '../../../resource/ProjectMgmtBundle';
 import helpDefault from '../../icon/help.png';
@@ -87,8 +87,6 @@ const HELP_CONTENT: Record<string, { title: string; content: string }> = {
 export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
   const helpImg = helpDefault;
   const fileChooserImg = fileChooser;
-  const p12FileRef = useRef<HTMLInputElement | null>(null);
-  const csrFileRef = useRef<HTMLInputElement | null>(null);
 
   const [form, setForm] = useState<CertificateForm>({
     p12Name: '',
@@ -122,33 +120,44 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
   };
 
   // ======================
-  // 文件选择（p12）
+  // 文件选择 — 通过 CEF 后端打开 IntelliJ 原生文件选择器
   // ======================
-  const handleSelectP12 = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.name.toLowerCase().endsWith('.p12')) {
-      message.error(getMessage('uploadProduct.importCer.error.p12Format'));
-      return;
-    }
-
-    updateField('p12Path', file.name);
+  const handleSelectP12Path = (): void => {
+    const queryCfg = new CefQueryCfg('SelectFilePath');
+    queryCfg.data = JSON.stringify({ extensions: ['.p12'], title: 'Select .p12 file' });
+    queryCfg.success = (data: string): void => {
+      try {
+        const result = JSON.parse(data);
+        if (result.path) {
+          updateField('p12Path', result.path);
+        }
+      } catch {
+        message.error('Failed to parse file path response');
+      }
+    };
+    queryCfg.failure = (): void => {
+      // 用户取消选择，无操作
+    };
+    sendCefQuery(queryCfg);
   };
 
-  // ======================
-  // 文件选择（CSR）
-  // ======================
-  const handleSelectCSR = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.name.toLowerCase().endsWith('.csr')) {
-      message.error(getMessage('uploadProduct.importCer.error.csrFormat'));
-      return;
-    }
-
-    updateField('csrPath', file.name);
+  const handleSelectCSRPath = (): void => {
+    const queryCfg = new CefQueryCfg('SelectFilePath');
+    queryCfg.data = JSON.stringify({ extensions: ['.csr'], title: 'Select .csr file' });
+    queryCfg.success = (data: string): void => {
+      try {
+        const result = JSON.parse(data);
+        if (result.path) {
+          updateField('csrPath', result.path);
+        }
+      } catch {
+        message.error('Failed to parse file path response');
+      }
+    };
+    queryCfg.failure = (): void => {
+      // 用户取消选择，无操作
+    };
+    sendCefQuery(queryCfg);
   };
 
   // ======================
@@ -398,8 +407,8 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                   <img
                     src={fileChooserImg}
                     className="file-icon"
-                    onClick={() => p12FileRef.current?.click()}
-                    alt="choose file"
+                    onClick={handleSelectP12Path}
+                    alt="choose p12 file"
                   />
                 </div>
                 <HelpIcon helpKey="__none__" />
@@ -408,13 +417,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.p12Path || ''}
               </div>
             </div>
-            <input
-              ref={p12FileRef}
-              type="file"
-              accept=".p12"
-              style={{ display: 'none' }}
-              onChange={handleSelectP12}
-            />
             {errors.p12Path && <div className="field-error">{errors.p12Path}</div>}
           </div>
         </div>
@@ -480,8 +482,8 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                   <img
                     src={fileChooserImg}
                     className="file-icon"
-                    onClick={() => p12FileRef.current?.click()}
-                    alt="choose file"
+                    onClick={handleSelectP12Path}
+                    alt="choose p12 file"
                   />
                 </div>
                 <HelpIcon helpKey="keyAlias" />
@@ -666,8 +668,8 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                   <img
                     src={fileChooserImg}
                     className="file-icon"
-                    onClick={() => csrFileRef.current?.click()}
-                    alt="choose file"
+                    onClick={handleSelectCSRPath}
+                    alt="choose csr file"
                   />
                 </div>
                 <HelpIcon helpKey="__none__" />
@@ -676,13 +678,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.csrPath || ''}
               </div>
             </div>
-            <input
-              ref={csrFileRef}
-              type="file"
-              accept=".csr"
-              style={{ display: 'none' }}
-              onChange={handleSelectCSR}
-            />
             {errors.csrPath && <div className="field-error">{errors.csrPath}</div>}
           </div>
         </div>
