@@ -2,6 +2,7 @@ package com.shopping.signing;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.fileChooser.FileChooser;
 import com.intellij.openapi.fileChooser.FileChooserDescriptor;
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory;
@@ -12,21 +13,25 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * CEF Query Handler — 打开 IntelliJ 原生文件选择器
+ * CEF Query Handler — 打开 IntelliJ 原生文件夹选择器
  *
  * 处理前端 ImportCer 页面点击文件夹图标事件。
- * 在 IntelliJ 底层打开原生文件/目录选择对话框，将所选路径回填到前端。
+ * 在 IntelliJ 底层打开原生目录选择对话框，将所选路径回填到前端。
  *
  * 注册方式：cefQueryHandlerMap.put(EVENT_SELECT_FILE_PATH, new SelectFilePathHandler(project));
  *
  * 请求数据格式：
- *   { "extensions": [".p12"], "title": "Select .p12 file" }
+ *   { "title": "Select folder" }
  *
  * 响应数据格式：
- *   { "path": "/selected/file.p12" }
+ *   { "path": "/selected/folder" }
  *   用户取消时：{ "path": "" }（无数据，前端不更新）
+ *
+ * 注意：FileChooser.chooseFile() 必须在 EDT 线程上调用，
+ * 此处通过 ApplicationManager.getApplication().invokeAndWait() 确保。
  */
 public class SelectFilePathHandler implements CefQueryHandler {
 
@@ -57,8 +62,12 @@ public class SelectFilePathHandler implements CefQueryHandler {
                 String title = request.has("title") ? request.get("title").getAsString() : "Select folder";
                 descriptor.setTitle(title);
 
-                // 3. 在 EDT (Event Dispatch Thread) 上打开文件选择器
-                VirtualFile file = FileChooser.chooseFile(descriptor, project, null);
+                // 3. 在 EDT 上打开文件选择器（FileChooser.chooseFile 必须在 EDT 调用）
+                AtomicReference<VirtualFile> fileRef = new AtomicReference<>();
+                ApplicationManager.getApplication().invokeAndWait(() -> {
+                    fileRef.set(FileChooser.chooseFile(descriptor, project, null));
+                });
+                VirtualFile file = fileRef.get();
 
                 // 4. 返回结果
                 JsonObject response = new JsonObject();
