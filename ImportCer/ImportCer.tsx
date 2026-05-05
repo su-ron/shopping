@@ -322,7 +322,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
             title={help.title}
             content={help.content}
             trigger="hover"
-            placement="right"
+            placement="bottomRight"
           >
             <img src={helpImg} className="help-icon" alt="help" />
           </Popover>
@@ -480,22 +480,19 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
           {advanceOpen && (
             <div className="advance-body">
-              {/* Validity(years) */}
+              {/* Validity(years) — 短输入框，1/4宽度 */}
               <div className="form-row">
                 <FormLabel required>{getMessage('uploadProduct.importCer.label.validity')}</FormLabel>
                 <div className="form-right">
-                  <div className="form-line">
-                    <InputNumber
-                      className="form-input-number"
-                      min={1}
-                      max={100}
-                      value={form.validity}
-                      onChange={value => updateField('validity', value ?? undefined)}
-                      onBlur={() => handleBlur('validity')}
-                      status={errors.validity ? 'error' : undefined}
-                    />
-                    <HelpIcon helpKey="__none__" />
-                  </div>
+                  <InputNumber
+                    className="form-input-number"
+                    min={1}
+                    max={100}
+                    value={form.validity}
+                    onChange={value => updateField('validity', value ?? undefined)}
+                    onBlur={() => handleBlur('validity')}
+                    status={errors.validity ? 'error' : undefined}
+                  />
                   {errors.validity && <div className="field-error">{errors.validity}</div>}
                 </div>
               </div>
@@ -677,7 +674,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
             title={getMessage('uploadProduct.importCer.help.title')}
             content={getMessage('uploadProduct.importCer.help.content')}
             trigger="hover"
-            placement="right"
+            placement="bottomRight"
           >
             <span className="help-icon">
               <img className="help-img" src={helpImg} alt="help" />
