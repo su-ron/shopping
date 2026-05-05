@@ -8,6 +8,7 @@ import './index.less';
 
 import { CefQueryCfg } from '../../../../cef/CefQueryCfg';
 import { sendCefQuery } from '../../../../cef/CefQuery';
+import { ImportCertificatePayload, ImportCertificateResult } from '../datastructure/ImportCertificateData';
 
 type Props = {
   onNext: () => void;
@@ -287,8 +288,52 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     if (!validateForm()) {
       return;
     }
+
     setLoading(true);
-    // TODO: trigger CEF request
+
+    // 构造请求 payload（不包含 confirmPassword，此为前端校验字段）
+    const payload: ImportCertificatePayload = {
+      p12Name: form.p12Name,
+      p12Path: form.p12Path,
+      password: form.password,
+      keyAlias: form.keyAlias,
+      validity: form.validity!,
+      firstName: form.firstName,
+      orgUnit: form.orgUnit,
+      organization: form.organization,
+      city: form.city,
+      province: form.province,
+      countryCode: form.countryCode,
+      CSRName: form.CSRName,
+      csrPath: form.csrPath,
+    };
+
+    // 构造 CEF Query
+    const queryCfg = new CefQueryCfg('ImportCertificate');
+    queryCfg.data = JSON.stringify(payload);
+
+    queryCfg.success = (data: string): void => {
+      setLoading(false);
+      try {
+        const response = JSON.parse(data);
+        if (response.success) {
+          // 成功 → 进入下一步
+          onNext();
+        } else {
+          // 业务错误 → 显示后端返回的错误信息
+          message.error(response.error?.message || 'Import failed');
+        }
+      } catch {
+        message.error('Invalid response from server');
+      }
+    };
+
+    queryCfg.failure = (errorCode: number, errorMessage: string): void => {
+      setLoading(false);
+      message.error(errorMessage || `CEF error (code: ${errorCode})`);
+    };
+
+    sendCefQuery(queryCfg);
   };
 
   // ======================
