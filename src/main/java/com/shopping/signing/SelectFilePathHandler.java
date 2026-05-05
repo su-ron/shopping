@@ -52,18 +52,9 @@ public class SelectFilePathHandler implements CefQueryHandler {
                 // 1. 解析前端请求参数
                 JsonObject request = GSON.fromJson(data, JsonObject.class);
 
-                // 2. 构造文件选择描述符
-                FileChooserDescriptor descriptor;
-                if (request.has("extensions") && request.get("extensions").getAsJsonArray().size() > 0) {
-                    // 按扩展名过滤 — 例如只显示 .p12 / .csr 文件
-                    descriptor = FileChooserDescriptorFactory.createSingleFileDescriptor();
-                } else {
-                    // 默认选择目录
-                    descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
-                }
-
-                // 设置对话框标题
-                String title = request.has("title") ? request.get("title").getAsString() : "Select file";
+                // 2. 构造文件夹选择描述符（选择保存路径，而非文件本身）
+                FileChooserDescriptor descriptor = FileChooserDescriptorFactory.createSingleFolderDescriptor();
+                String title = request.has("title") ? request.get("title").getAsString() : "Select folder";
                 descriptor.setTitle(title);
 
                 // 3. 在 EDT (Event Dispatch Thread) 上打开文件选择器
