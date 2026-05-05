@@ -96,7 +96,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     password: '',
     confirmPassword: '',
     keyAlias: '',
-    validity: undefined,
+    validity: 25,
     firstName: '',
     orgUnit: '',
     organization: '',
@@ -162,7 +162,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
         const value = form.p12Name;
         if (!value) {
           error = getMessage('uploadProduct.importCer.error.p12NameRequired');
-        } else if (!/^[a-zA-Z0-9_-]+\.p12$/.test(value)) {
+        } else if (!/^[a-zA-Z0-9_.-]+\.p12$/.test(value)) {
           error = getMessage('uploadProduct.importCer.error.p12NameFormat');
         }
         break;
@@ -178,6 +178,8 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           error = getMessage('uploadProduct.importCer.error.passwordRequired');
         } else if (value.length < 6) {
           error = getMessage('uploadProduct.importCer.error.passwordMinLength');
+        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~!@#$%^&*()\-_=+|[\]{};:'",.<>/?`])/.test(value)) {
+          error = getMessage('uploadProduct.importCer.error.passwordComplexity');
         }
         break;
       }
@@ -206,40 +208,14 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
         }
         break;
       }
+      // 高级设置字段不强制填写，跳过校验
       case 'firstName':
-        if (!form.firstName) {
-          error = getMessage('uploadProduct.importCer.error.firstNameRequired');
-        }
-        break;
       case 'orgUnit':
-        if (!form.orgUnit) {
-          error = getMessage('uploadProduct.importCer.error.orgUnitRequired');
-        }
-        break;
       case 'organization':
-        if (!form.organization) {
-          error = getMessage('uploadProduct.importCer.error.organizationRequired');
-        }
-        break;
       case 'city':
-        if (!form.city) {
-          error = getMessage('uploadProduct.importCer.error.cityRequired');
-        }
-        break;
       case 'province':
-        if (!form.province) {
-          error = getMessage('uploadProduct.importCer.error.provinceRequired');
-        }
+      case 'countryCode':
         break;
-      case 'countryCode': {
-        const value = form.countryCode;
-        if (!value) {
-          error = getMessage('uploadProduct.importCer.error.countryCodeRequired');
-        } else if (!/^[A-Z]{2}$/.test(value)) {
-          error = getMessage('uploadProduct.importCer.error.countryCodeFormat');
-        }
-        break;
-      }
       case 'CSRName':
         if (!form.CSRName) {
           error = getMessage('uploadProduct.importCer.error.csrNameRequired');
@@ -266,8 +242,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
   const validateForm = (): boolean => {
     const fields: (keyof FormErrors)[] = [
       'p12Name', 'p12Path', 'password', 'confirmPassword',
-      'keyAlias', 'validity', 'firstName', 'orgUnit',
-      'organization', 'city', 'province', 'countryCode',
+      'keyAlias', 'validity',
       'CSRName', 'csrPath',
     ];
     let isValid = true;
@@ -292,13 +267,14 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     setLoading(true);
 
     // 构造请求 payload（不包含 confirmPassword，此为前端校验字段）
+    // 高级设置字段非必填，firstName 为空时取 alias 值
     const payload: ImportCertificatePayload = {
       p12Name: form.p12Name,
       p12Path: form.p12Path,
       password: form.password,
       keyAlias: form.keyAlias,
       validity: form.validity!,
-      firstName: form.firstName,
+      firstName: form.firstName || form.keyAlias,
       orgUnit: form.orgUnit,
       organization: form.organization,
       city: form.city,
@@ -544,7 +520,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
               {/* First and last name */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.firstName')}</FormLabel>
+                <FormLabel>{getMessage('uploadProduct.importCer.label.firstName')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
                     <Input
@@ -562,7 +538,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
               {/* Organizational unit */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.orgUnit')}</FormLabel>
+                <FormLabel>{getMessage('uploadProduct.importCer.label.orgUnit')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
                     <Input
@@ -580,7 +556,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
               {/* Organization */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.organization')}</FormLabel>
+                <FormLabel>{getMessage('uploadProduct.importCer.label.organization')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
                     <Input
@@ -598,7 +574,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
               {/* City or locality */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.city')}</FormLabel>
+                <FormLabel>{getMessage('uploadProduct.importCer.label.city')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
                     <Input
@@ -616,7 +592,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
               {/* State or province */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.province')}</FormLabel>
+                <FormLabel>{getMessage('uploadProduct.importCer.label.province')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
                     <Input
@@ -634,7 +610,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
 
               {/* Country code(XX) */}
               <div className="form-row">
-                <FormLabel required>{getMessage('uploadProduct.importCer.label.countryCode')}</FormLabel>
+                <FormLabel>{getMessage('uploadProduct.importCer.label.countryCode')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
                     <Input
