@@ -410,3 +410,37 @@
   color: rgba(230, 230, 230, 0.6);
   margin-top: 2px;
 }
+
+/* ================= IntelliJ Style Error Bubble ================= */
+.intellij-field-wrapper {
+  position: relative;
+  display: inline-flex;
+  flex: 1;
+}
+
+.intellij-error-bubble {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  z-index: 100;
+  background: #c62828;
+  color: #ffffff;
+  font-size: 11px;
+  line-height: 1.4;
+  padding: 4px 8px;
+  border-radius: 3px;
+  white-space: nowrap;
+  max-width: 400px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+
+  /* 朝下的三角形箭头 */
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 16px;
+    border: 5px solid transparent;
+    border-top-color: #c62828;
+  }
+}

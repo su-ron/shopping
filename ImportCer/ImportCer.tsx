@@ -106,6 +106,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [backendFieldErrors, setBackendFieldErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [advanceOpen, setAdvanceOpen] = useState(false);
 
@@ -117,6 +118,31 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     if (errors[key as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [key]: undefined }));
     }
+    if (backendFieldErrors[key as keyof FormErrors]) {
+      setBackendFieldErrors(prev => ({ ...prev, [key]: undefined }));
+    }
+  };
+
+  // ======================
+  // 后端错误消息 → 字段映射
+  // ======================
+  const matchErrorToField = (message: string): keyof FormErrors | null => {
+    const m = message.toLowerCase();
+    if (m.includes('p12name') || (m.includes('key store') && m.includes('name'))) return 'p12Name';
+    if (m.includes('p12path') || (m.includes('p12') && m.includes('path'))) return 'p12Path';
+    if (m.includes('password')) return 'password';
+    if (m.includes('confirm')) return 'confirmPassword';
+    if (m.includes('alias') || m.includes('keyalias')) return 'keyAlias';
+    if (m.includes('validity')) return 'validity';
+    if (m.includes('firstname') || (m.includes('first') && m.includes('name'))) return 'firstName';
+    if (m.includes('orgunit') || (m.includes('organi') && m.includes('unit'))) return 'orgUnit';
+    if (m.includes('organization')) return 'organization';
+    if (m.includes('city') || m.includes('locality')) return 'city';
+    if (m.includes('province') || m.includes('state')) return 'province';
+    if (m.includes('countrycode') || m.includes('country code')) return 'countryCode';
+    if (m.includes('csrname') || (m.includes('csr') && m.includes('name'))) return 'CSRName';
+    if (m.includes('csrpath') || (m.includes('csr') && m.includes('path'))) return 'csrPath';
+    return null;
   };
 
   // ======================
@@ -302,11 +328,16 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
       try {
         const response = JSON.parse(data);
         if (response.success) {
-          // 成功 → 进入下一步
           onNext();
         } else {
-          // 业务错误 → 显示后端返回的错误信息
-          message.error(response.error?.message || 'Import failed');
+          // 业务错误 → 映射到字段并在输入框上方显示 IntelliJ 风格错误气泡
+          const msg = response.error?.message || 'Import failed';
+          const field = matchErrorToField(msg);
+          if (field) {
+            setBackendFieldErrors(prev => ({ ...prev, [field]: msg }));
+          } else {
+            message.error(msg);
+          }
         }
       } catch {
         message.error('Invalid response from server');
@@ -361,6 +392,17 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     );
   };
 
+  // IntelliJ 风格错误气泡 — 包裹输入框，在输入框上方显示错误
+  const IntelliJFieldWrapper = ({ field, children }: { field: keyof FormErrors; children: React.ReactNode }) => {
+    const error = backendFieldErrors[field];
+    return (
+      <div className="intellij-field-wrapper">
+        {error && <div className="intellij-error-bubble">{error}</div>}
+        {children}
+      </div>
+    );
+  };
+
   return (
     <div className="import-cer-container">
       {/* ================= TITLE ================= */}
@@ -376,13 +418,15 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.p12FileName')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <Input
-                className="form-input"
-                value={form.p12Name}
-                onChange={e => updateField('p12Name', e.target.value)}
-                onBlur={() => handleBlur('p12Name')}
-                status={errors.p12Name ? 'error' : undefined}
-              />
+              <IntelliJFieldWrapper field="p12Name">
+                <Input
+                  className="form-input"
+                  value={form.p12Name}
+                  onChange={e => updateField('p12Name', e.target.value)}
+                  onBlur={() => handleBlur('p12Name')}
+                  status={errors.p12Name ? 'error' : undefined}
+                />
+              </IntelliJFieldWrapper>
               <HelpIcon helpKey="p12Name" />
             </div>
             {errors.p12Name && <div className="field-error">{errors.p12Name}</div>}
@@ -395,22 +439,24 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <div className="input-icon-wrapper">
-                  <input
-                    type="text"
-                    className="form-path-input"
-                    value={form.p12Path}
-                    onChange={e => updateField('p12Path', e.target.value)}
-                    onBlur={() => handleBlur('p12Path')}
-                    placeholder=""
-                  />
-                  <img
+                <IntelliJFieldWrapper field="p12Path">
+                  <div className="input-icon-wrapper">
+                    <input
+                      type="text"
+                      className="form-path-input"
+                      value={form.p12Path}
+                      onChange={e => updateField('p12Path', e.target.value)}
+                      onBlur={() => handleBlur('p12Path')}
+                      placeholder=""
+                    />
+                    <img
                     src={fileChooserImg}
                     className="file-icon"
                     onClick={handleSelectP12Path}
                     alt="choose p12 file"
                   />
                 </div>
+                </IntelliJFieldWrapper>
                 <HelpIcon helpKey="__none__" />
               </div>
               <div className="path-hint">
@@ -426,14 +472,16 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.keyStorePassword')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <Input.Password
-                className="form-input"
-                value={form.password}
-                onChange={e => updateField('password', e.target.value)}
-                onBlur={() => handleBlur('password')}
-                status={errors.password ? 'error' : undefined}
-                iconRender={() => null}
-              />
+              <IntelliJFieldWrapper field="password">
+                <Input.Password
+                  className="form-input"
+                  value={form.password}
+                  onChange={e => updateField('password', e.target.value)}
+                  onBlur={() => handleBlur('password')}
+                  status={errors.password ? 'error' : undefined}
+                  iconRender={() => null}
+                />
+              </IntelliJFieldWrapper>
               <HelpIcon helpKey="__none__" />
             </div>
             {errors.password && <div className="field-error">{errors.password}</div>}
@@ -445,14 +493,16 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.confirmPassword')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <Input.Password
-                className="form-input"
-                value={form.confirmPassword}
-                onChange={e => updateField('confirmPassword', e.target.value)}
-                onBlur={() => handleBlur('confirmPassword')}
-                status={errors.confirmPassword ? 'error' : undefined}
-                iconRender={() => null}
-              />
+              <IntelliJFieldWrapper field="confirmPassword">
+                <Input.Password
+                  className="form-input"
+                  value={form.confirmPassword}
+                  onChange={e => updateField('confirmPassword', e.target.value)}
+                  onBlur={() => handleBlur('confirmPassword')}
+                  status={errors.confirmPassword ? 'error' : undefined}
+                  iconRender={() => null}
+                />
+              </IntelliJFieldWrapper>
               <HelpIcon helpKey="__none__" />
             </div>
             {errors.confirmPassword && <div className="field-error">{errors.confirmPassword}</div>}
@@ -471,21 +521,23 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <div className="input-icon-wrapper">
-                  <Input
-                    className="form-input"
-                    value={form.keyAlias}
-                    onChange={e => updateField('keyAlias', e.target.value)}
-                    onBlur={() => handleBlur('keyAlias')}
-                    status={errors.keyAlias ? 'error' : undefined}
-                  />
-                  <img
-                    src={fileChooserImg}
-                    className="file-icon"
-                    onClick={handleSelectP12Path}
-                    alt="choose p12 file"
-                  />
-                </div>
+                <IntelliJFieldWrapper field="keyAlias">
+                  <div className="input-icon-wrapper">
+                    <Input
+                      className="form-input"
+                      value={form.keyAlias}
+                      onChange={e => updateField('keyAlias', e.target.value)}
+                      onBlur={() => handleBlur('keyAlias')}
+                      status={errors.keyAlias ? 'error' : undefined}
+                    />
+                    <img
+                      src={fileChooserImg}
+                      className="file-icon"
+                      onClick={handleSelectP12Path}
+                      alt="choose p12 file"
+                    />
+                  </div>
+                </IntelliJFieldWrapper>
                 <HelpIcon helpKey="keyAlias" />
               </div>
             </div>
@@ -507,15 +559,17 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               <div className="form-row">
                 <FormLabel required>{getMessage('uploadProduct.importCer.label.validity')}</FormLabel>
                 <div className="form-right">
-                  <InputNumber
-                    className="form-input-number"
-                    min={1}
-                    max={100}
-                    value={form.validity}
-                    onChange={value => updateField('validity', value ?? undefined)}
-                    onBlur={() => handleBlur('validity')}
-                    status={errors.validity ? 'error' : undefined}
-                  />
+                  <IntelliJFieldWrapper field="validity">
+                    <InputNumber
+                      className="form-input-number"
+                      min={1}
+                      max={100}
+                      value={form.validity}
+                      onChange={value => updateField('validity', value ?? undefined)}
+                      onBlur={() => handleBlur('validity')}
+                      status={errors.validity ? 'error' : undefined}
+                    />
+                  </IntelliJFieldWrapper>
                   {errors.validity && <div className="field-error">{errors.validity}</div>}
                 </div>
               </div>
@@ -525,13 +579,15 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.firstName')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <Input
-                      className="form-input"
-                      value={form.firstName}
-                      onChange={e => updateField('firstName', e.target.value)}
-                      onBlur={() => handleBlur('firstName')}
-                      status={errors.firstName ? 'error' : undefined}
-                    />
+                    <IntelliJFieldWrapper field="firstName">
+                      <Input
+                        className="form-input"
+                        value={form.firstName}
+                        onChange={e => updateField('firstName', e.target.value)}
+                        onBlur={() => handleBlur('firstName')}
+                        status={errors.firstName ? 'error' : undefined}
+                      />
+                    </IntelliJFieldWrapper>
                     <HelpIcon helpKey="firstName" />
                   </div>
                   {errors.firstName && <div className="field-error">{errors.firstName}</div>}
@@ -543,13 +599,15 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.orgUnit')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <Input
-                      className="form-input"
-                      value={form.orgUnit}
-                      onChange={e => updateField('orgUnit', e.target.value)}
-                      onBlur={() => handleBlur('orgUnit')}
-                      status={errors.orgUnit ? 'error' : undefined}
-                    />
+                    <IntelliJFieldWrapper field="orgUnit">
+                      <Input
+                        className="form-input"
+                        value={form.orgUnit}
+                        onChange={e => updateField('orgUnit', e.target.value)}
+                        onBlur={() => handleBlur('orgUnit')}
+                        status={errors.orgUnit ? 'error' : undefined}
+                      />
+                    </IntelliJFieldWrapper>
                     <HelpIcon helpKey="orgUnit" />
                   </div>
                   {errors.orgUnit && <div className="field-error">{errors.orgUnit}</div>}
@@ -561,13 +619,15 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.organization')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <Input
-                      className="form-input"
-                      value={form.organization}
-                      onChange={e => updateField('organization', e.target.value)}
-                      onBlur={() => handleBlur('organization')}
-                      status={errors.organization ? 'error' : undefined}
-                    />
+                    <IntelliJFieldWrapper field="organization">
+                      <Input
+                        className="form-input"
+                        value={form.organization}
+                        onChange={e => updateField('organization', e.target.value)}
+                        onBlur={() => handleBlur('organization')}
+                        status={errors.organization ? 'error' : undefined}
+                      />
+                    </IntelliJFieldWrapper>
                     <HelpIcon helpKey="organization" />
                   </div>
                   {errors.organization && <div className="field-error">{errors.organization}</div>}
@@ -579,13 +639,15 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.city')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <Input
-                      className="form-input"
-                      value={form.city}
-                      onChange={e => updateField('city', e.target.value)}
-                      onBlur={() => handleBlur('city')}
-                      status={errors.city ? 'error' : undefined}
-                    />
+                    <IntelliJFieldWrapper field="city">
+                      <Input
+                        className="form-input"
+                        value={form.city}
+                        onChange={e => updateField('city', e.target.value)}
+                        onBlur={() => handleBlur('city')}
+                        status={errors.city ? 'error' : undefined}
+                      />
+                    </IntelliJFieldWrapper>
                     <HelpIcon helpKey="city" />
                   </div>
                   {errors.city && <div className="field-error">{errors.city}</div>}
@@ -597,13 +659,15 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.province')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <Input
-                      className="form-input"
-                      value={form.province}
-                      onChange={e => updateField('province', e.target.value)}
-                      onBlur={() => handleBlur('province')}
-                      status={errors.province ? 'error' : undefined}
-                    />
+                    <IntelliJFieldWrapper field="province">
+                      <Input
+                        className="form-input"
+                        value={form.province}
+                        onChange={e => updateField('province', e.target.value)}
+                        onBlur={() => handleBlur('province')}
+                        status={errors.province ? 'error' : undefined}
+                      />
+                    </IntelliJFieldWrapper>
                     <HelpIcon helpKey="province" />
                   </div>
                   {errors.province && <div className="field-error">{errors.province}</div>}
@@ -615,14 +679,16 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.countryCode')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <Input
-                      className="form-input"
-                      value={form.countryCode}
-                      onChange={e => updateField('countryCode', e.target.value)}
-                      onBlur={() => handleBlur('countryCode')}
-                      status={errors.countryCode ? 'error' : undefined}
-                      maxLength={2}
-                    />
+                    <IntelliJFieldWrapper field="countryCode">
+                      <Input
+                        className="form-input"
+                        value={form.countryCode}
+                        onChange={e => updateField('countryCode', e.target.value)}
+                        onBlur={() => handleBlur('countryCode')}
+                        status={errors.countryCode ? 'error' : undefined}
+                        maxLength={2}
+                      />
+                    </IntelliJFieldWrapper>
                     <HelpIcon helpKey="__none__" />
                   </div>
                   {errors.countryCode && <div className="field-error">{errors.countryCode}</div>}
@@ -637,13 +703,15 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.csrFile')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <Input
-                className="form-input"
-                value={form.CSRName}
-                onChange={e => updateField('CSRName', e.target.value)}
-                onBlur={() => handleBlur('CSRName')}
-                status={errors.CSRName ? 'error' : undefined}
-              />
+              <IntelliJFieldWrapper field="CSRName">
+                <Input
+                  className="form-input"
+                  value={form.CSRName}
+                  onChange={e => updateField('CSRName', e.target.value)}
+                  onBlur={() => handleBlur('CSRName')}
+                  status={errors.CSRName ? 'error' : undefined}
+                />
+              </IntelliJFieldWrapper>
               <HelpIcon helpKey="csrFile" />
             </div>
             {errors.CSRName && <div className="field-error">{errors.CSRName}</div>}
@@ -656,22 +724,24 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <div className="input-icon-wrapper">
-                  <input
-                    type="text"
-                    className="form-path-input"
-                    value={form.csrPath}
-                    onChange={e => updateField('csrPath', e.target.value)}
-                    onBlur={() => handleBlur('csrPath')}
-                    placeholder=""
-                  />
-                  <img
-                    src={fileChooserImg}
-                    className="file-icon"
-                    onClick={handleSelectCSRPath}
-                    alt="choose csr file"
-                  />
-                </div>
+                <IntelliJFieldWrapper field="csrPath">
+                  <div className="input-icon-wrapper">
+                    <input
+                      type="text"
+                      className="form-path-input"
+                      value={form.csrPath}
+                      onChange={e => updateField('csrPath', e.target.value)}
+                      onBlur={() => handleBlur('csrPath')}
+                      placeholder=""
+                    />
+                    <img
+                      src={fileChooserImg}
+                      className="file-icon"
+                      onClick={handleSelectCSRPath}
+                      alt="choose csr file"
+                    />
+                  </div>
+                </IntelliJFieldWrapper>
                 <HelpIcon helpKey="__none__" />
               </div>
               <div className="path-hint">
