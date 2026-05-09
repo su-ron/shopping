@@ -84,6 +84,16 @@ const HELP_CONTENT: Record<string, { title: string; content: string }> = {
   },
 };
 
+// IntelliJ 风格错误气泡 — 包裹输入框，在输入框上方显示错误
+const IntelliJFieldWrapper = ({ error, children }: { error?: string; children: React.ReactNode }) => {
+  return (
+    <div className="intellij-field-wrapper">
+      {error && <div className="intellij-error-bubble">{error}</div>}
+      {children}
+    </div>
+  );
+};
+
 export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
   const helpImg = helpDefault;
   const fileChooserImg = fileChooser;
@@ -392,17 +402,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     );
   };
 
-  // IntelliJ 风格错误气泡 — 包裹输入框，在输入框上方显示错误
-  const IntelliJFieldWrapper = ({ field, children }: { field: keyof FormErrors; children: React.ReactNode }) => {
-    const error = backendFieldErrors[field];
-    return (
-      <div className="intellij-field-wrapper">
-        {error && <div className="intellij-error-bubble">{error}</div>}
-        {children}
-      </div>
-    );
-  };
-
   return (
     <div className="import-cer-container">
       {/* ================= TITLE ================= */}
@@ -418,7 +417,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.p12FileName')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <IntelliJFieldWrapper field="p12Name">
+              <IntelliJFieldWrapper error={errors.p12Name || backendFieldErrors.p12Name}>
                 <Input
                   className="form-input"
                   value={form.p12Name}
@@ -429,7 +428,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               </IntelliJFieldWrapper>
               <HelpIcon helpKey="p12Name" />
             </div>
-            {errors.p12Name && <div className="field-error">{errors.p12Name}</div>}
           </div>
         </div>
 
@@ -439,7 +437,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <IntelliJFieldWrapper field="p12Path">
+                <IntelliJFieldWrapper error={errors.p12Path || backendFieldErrors.p12Path}>
                   <div className="input-icon-wrapper">
                     <input
                       type="text"
@@ -463,7 +461,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.p12Path || ''}
               </div>
             </div>
-            {errors.p12Path && <div className="field-error">{errors.p12Path}</div>}
           </div>
         </div>
 
@@ -472,7 +469,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.keyStorePassword')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <IntelliJFieldWrapper field="password">
+              <IntelliJFieldWrapper error={errors.password || backendFieldErrors.password}>
                 <Input.Password
                   className="form-input"
                   value={form.password}
@@ -484,7 +481,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               </IntelliJFieldWrapper>
               <HelpIcon helpKey="__none__" />
             </div>
-            {errors.password && <div className="field-error">{errors.password}</div>}
           </div>
         </div>
 
@@ -493,7 +489,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.confirmPassword')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <IntelliJFieldWrapper field="confirmPassword">
+              <IntelliJFieldWrapper error={errors.confirmPassword || backendFieldErrors.confirmPassword}>
                 <Input.Password
                   className="form-input"
                   value={form.confirmPassword}
@@ -505,7 +501,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               </IntelliJFieldWrapper>
               <HelpIcon helpKey="__none__" />
             </div>
-            {errors.confirmPassword && <div className="field-error">{errors.confirmPassword}</div>}
           </div>
         </div>
 
@@ -521,7 +516,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <IntelliJFieldWrapper field="keyAlias">
+                <IntelliJFieldWrapper error={errors.keyAlias || backendFieldErrors.keyAlias}>
                   <div className="input-icon-wrapper">
                     <Input
                       className="form-input"
@@ -541,7 +536,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <HelpIcon helpKey="keyAlias" />
               </div>
             </div>
-            {errors.keyAlias && <div className="field-error">{errors.keyAlias}</div>}
           </div>
         </div>
 
@@ -559,7 +553,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               <div className="form-row">
                 <FormLabel required>{getMessage('uploadProduct.importCer.label.validity')}</FormLabel>
                 <div className="form-right">
-                  <IntelliJFieldWrapper field="validity">
+                  <IntelliJFieldWrapper error={errors.validity || backendFieldErrors.validity}>
                     <InputNumber
                       className="form-input-number"
                       min={1}
@@ -570,7 +564,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                       status={errors.validity ? 'error' : undefined}
                     />
                   </IntelliJFieldWrapper>
-                  {errors.validity && <div className="field-error">{errors.validity}</div>}
                 </div>
               </div>
 
@@ -579,7 +572,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.firstName')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <IntelliJFieldWrapper field="firstName">
+                    <IntelliJFieldWrapper error={errors.firstName || backendFieldErrors.firstName}>
                       <Input
                         className="form-input"
                         value={form.firstName}
@@ -590,7 +583,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                     </IntelliJFieldWrapper>
                     <HelpIcon helpKey="firstName" />
                   </div>
-                  {errors.firstName && <div className="field-error">{errors.firstName}</div>}
                 </div>
               </div>
 
@@ -599,7 +591,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.orgUnit')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <IntelliJFieldWrapper field="orgUnit">
+                    <IntelliJFieldWrapper error={errors.orgUnit || backendFieldErrors.orgUnit}>
                       <Input
                         className="form-input"
                         value={form.orgUnit}
@@ -610,7 +602,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                     </IntelliJFieldWrapper>
                     <HelpIcon helpKey="orgUnit" />
                   </div>
-                  {errors.orgUnit && <div className="field-error">{errors.orgUnit}</div>}
                 </div>
               </div>
 
@@ -619,7 +610,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.organization')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <IntelliJFieldWrapper field="organization">
+                    <IntelliJFieldWrapper error={errors.organization || backendFieldErrors.organization}>
                       <Input
                         className="form-input"
                         value={form.organization}
@@ -630,7 +621,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                     </IntelliJFieldWrapper>
                     <HelpIcon helpKey="organization" />
                   </div>
-                  {errors.organization && <div className="field-error">{errors.organization}</div>}
                 </div>
               </div>
 
@@ -639,7 +629,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.city')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <IntelliJFieldWrapper field="city">
+                    <IntelliJFieldWrapper error={errors.city || backendFieldErrors.city}>
                       <Input
                         className="form-input"
                         value={form.city}
@@ -650,7 +640,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                     </IntelliJFieldWrapper>
                     <HelpIcon helpKey="city" />
                   </div>
-                  {errors.city && <div className="field-error">{errors.city}</div>}
                 </div>
               </div>
 
@@ -659,7 +648,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.province')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <IntelliJFieldWrapper field="province">
+                    <IntelliJFieldWrapper error={errors.province || backendFieldErrors.province}>
                       <Input
                         className="form-input"
                         value={form.province}
@@ -670,7 +659,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                     </IntelliJFieldWrapper>
                     <HelpIcon helpKey="province" />
                   </div>
-                  {errors.province && <div className="field-error">{errors.province}</div>}
                 </div>
               </div>
 
@@ -679,7 +667,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 <FormLabel>{getMessage('uploadProduct.importCer.label.countryCode')}</FormLabel>
                 <div className="form-right">
                   <div className="form-line">
-                    <IntelliJFieldWrapper field="countryCode">
+                    <IntelliJFieldWrapper error={errors.countryCode || backendFieldErrors.countryCode}>
                       <Input
                         className="form-input"
                         value={form.countryCode}
@@ -691,7 +679,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                     </IntelliJFieldWrapper>
                     <HelpIcon helpKey="__none__" />
                   </div>
-                  {errors.countryCode && <div className="field-error">{errors.countryCode}</div>}
                 </div>
               </div>
             </div>
@@ -703,7 +690,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <FormLabel required>{getMessage('uploadProduct.importCer.label.csrFile')}</FormLabel>
           <div className="form-right">
             <div className="form-line">
-              <IntelliJFieldWrapper field="CSRName">
+              <IntelliJFieldWrapper error={errors.CSRName || backendFieldErrors.CSRName}>
                 <Input
                   className="form-input"
                   value={form.CSRName}
@@ -714,7 +701,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
               </IntelliJFieldWrapper>
               <HelpIcon helpKey="csrFile" />
             </div>
-            {errors.CSRName && <div className="field-error">{errors.CSRName}</div>}
           </div>
         </div>
 
@@ -724,7 +710,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           <div className="form-right">
             <div className="file-input-wrapper">
               <div className="form-line">
-                <IntelliJFieldWrapper field="csrPath">
+                <IntelliJFieldWrapper error={errors.csrPath || backendFieldErrors.csrPath}>
                   <div className="input-icon-wrapper">
                     <input
                       type="text"
@@ -748,7 +734,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                 {getMessage('uploadProduct.importCer.label.fileWillBeCreatedIn')}: {form.csrPath || ''}
               </div>
             </div>
-            {errors.csrPath && <div className="field-error">{errors.csrPath}</div>}
           </div>
         </div>
       </div>
