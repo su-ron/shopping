@@ -438,7 +438,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                   <div className="input-icon-wrapper">
                     <input
                       type="text"
-                      className="form-path-input"
+                      className={`form-path-input${errors.p12Path || backendFieldErrors.p12Path ? ' has-error' : ''}`}
                       value={form.p12Path}
                       onChange={e => updateField('p12Path', e.target.value)}
                       onBlur={() => handleBlur('p12Path')}
@@ -711,7 +711,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                   <div className="input-icon-wrapper">
                     <input
                       type="text"
-                      className="form-path-input"
+                      className={`form-path-input${errors.csrPath || backendFieldErrors.csrPath ? ' has-error' : ''}`}
                       value={form.csrPath}
                       onChange={e => updateField('csrPath', e.target.value)}
                       onBlur={() => handleBlur('csrPath')}
