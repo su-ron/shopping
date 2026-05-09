@@ -94,9 +94,32 @@ const IntelliJFieldWrapper = ({ error, children }: { error?: string; children: R
   );
 };
 
+const FormLabel = ({ required, children }: { required?: boolean; children: React.ReactNode }) => (
+  <span className="form-label">
+    {required && <span className="required-star">*</span>}
+    {children}
+  </span>
+);
+
+const HelpIcon = ({ helpKey }: { helpKey: string }) => {
+  const help = HELP_CONTENT[helpKey];
+  return (
+    <span className={`help-icon-wrapper ${!help ? 'help-icon-placeholder' : ''}`}>
+      {help && (
+        <Popover
+          title={help.title}
+          content={help.content}
+          trigger="hover"
+          placement="bottomRight"
+        >
+          <img src={helpDefault} className="help-icon" alt="help" />
+        </Popover>
+      )}
+    </span>
+  );
+};
+
 export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
-  const helpImg = helpDefault;
-  const fileChooserImg = fileChooser;
 
   const [form, setForm] = useState<CertificateForm>({
     p12Name: '',
@@ -376,32 +399,6 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     setAdvanceOpen(prev => !prev);
   };
 
-  const FormLabel = ({ required, children }: { required?: boolean; children: React.ReactNode }) => (
-    <span className="form-label">
-      {required && <span className="required-star">*</span>}
-      {children}
-    </span>
-  );
-
-  // 统一帮助图标组件：无内容时渲染占位符以保持对齐
-  const HelpIcon = ({ helpKey }: { helpKey: string }) => {
-    const help = HELP_CONTENT[helpKey];
-    return (
-      <span className={`help-icon-wrapper ${!help ? 'help-icon-placeholder' : ''}`}>
-        {help && (
-          <Popover
-            title={help.title}
-            content={help.content}
-            trigger="hover"
-            placement="bottomRight"
-          >
-            <img src={helpImg} className="help-icon" alt="help" />
-          </Popover>
-        )}
-      </span>
-    );
-  };
-
   return (
     <div className="import-cer-container">
       {/* ================= TITLE ================= */}
@@ -448,7 +445,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                       placeholder=""
                     />
                     <img
-                    src={fileChooserImg}
+                    src={fileChooser}
                     className="file-icon"
                     onClick={handleSelectP12Path}
                     alt="choose p12 file"
@@ -526,7 +523,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                       status={errors.keyAlias ? 'error' : undefined}
                     />
                     <img
-                      src={fileChooserImg}
+                      src={fileChooser}
                       className="file-icon"
                       onClick={handleSelectP12Path}
                       alt="choose p12 file"
@@ -721,7 +718,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
                       placeholder=""
                     />
                     <img
-                      src={fileChooserImg}
+                      src={fileChooser}
                       className="file-icon"
                       onClick={handleSelectCSRPath}
                       alt="choose csr file"
@@ -748,7 +745,7 @@ export const ImportCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
             placement="bottomRight"
           >
             <span className="help-icon">
-              <img className="help-img" src={helpImg} alt="help" />
+              <img className="help-img" src={helpDefault} alt="help" />
             </span>
           </Popover>
         </div>
