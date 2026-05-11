@@ -23,12 +23,14 @@ export const CreateCerModal = ({ open, setOpen, onConfirm }: Props): React.JSX.E
     <Modal
       width={720}
       style={{ top: 80 }}
-      bodyStyle={{
-        flex: 1,
-        padding: 0,
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
+      styles={{
+        body: {
+          flex: 1,
+          padding: 0,
+          overflow: 'hidden',
+          display: 'flex',
+          flexDirection: 'column',
+        },
       }}
       getContainer={false}
       destroyOnClose
