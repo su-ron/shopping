@@ -22,7 +22,7 @@ export const CreateCerModal = ({ open, setOpen, onConfirm }: Props): React.JSX.E
   return (
     <Modal
       width={720}
-      style={{ top: 80 }}
+      style={{ top: 0 }}
       styles={{
         body: {
           flex: 1,
