@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Form, Input, InputNumber, Popover, message } from 'antd';
 import { getMessage } from '../../../resource/ProjectMgmtBundle';
 
@@ -18,6 +18,13 @@ export const CreateCer = ({ onNext, onCancel, setLoading, onFormErrorChange }: P
   const [advanceOpen, setAdvanceOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const dispatch = useAppDispatch();
+
+  // 首次打开时检查必填字段是否为空
+  useEffect(() => {
+    const values = formInstance.getFieldsValue(['p12Name', 'p12Path', 'storePassword', 'confirmPassword']);
+    const hasEmpty = ['p12Name', 'p12Path', 'storePassword', 'confirmPassword'].some(f => !values[f]);
+    onFormErrorChange?.(hasEmpty);
+  }, []);
 
   // 根据主题替换图标
   const theme = useSearchParams('theme');
@@ -165,7 +172,10 @@ export const CreateCer = ({ onNext, onCancel, setLoading, onFormErrorChange }: P
             }
           });
           setFieldErrors(errors);
-          onFormErrorChange?.(Object.keys(errors).length > 0);
+          // 同时校验空字段，处理首次打开时无校验记录的问题
+          const values = formInstance.getFieldsValue(['p12Name', 'p12Path', 'storePassword', 'confirmPassword']);
+          const hasEmpty = ['p12Name', 'p12Path', 'storePassword', 'confirmPassword'].some(f => !values[f]);
+          onFormErrorChange?.(Object.keys(errors).length > 0 || hasEmpty);
         }}
       >
         {/* ================= Key store name (*.p12) ================= */}

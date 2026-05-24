@@ -14,7 +14,7 @@ type Props = {
 
 export const CreateCerModal = ({ open, setOpen, onConfirm }: Props): React.JSX.Element => {
   const [loading, setLoading] = useState(false);
-  const [hasFormError, setHasFormError] = useState(false);
+  const [hasFormError, setHasFormError] = useState(true);
   const helpImg = helpDefault;
 
   const handleNext = (cerFilePath: string): void => {
