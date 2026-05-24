@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Form, Input, InputNumber, Button, Popover, message } from 'antd';
+import { Form, Input, InputNumber, Popover, message } from 'antd';
 import { getMessage } from '../../../resource/ProjectMgmtBundle';
-import helpDefault from '../../icon/help.png';
 
 import './index.less';
 
@@ -10,15 +9,12 @@ import { sendCefQuery } from '../../cef/CefQuery';
 import { ImportCertificatePayload, ImportCertificateResult } from '../datastructure/ImportCertificateData';
 import { FormRow } from './FormRow';
 
-type Props = { onNext: (cerFilePath: string) => void; onCancel: () => void; };
+type Props = { onNext: (cerFilePath: string) => void; onCancel: () => void; setLoading: (v: boolean) => void; };
 
-export const CreateCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
-  const helpImg = helpDefault;
+export const CreateCer = ({ onNext, onCancel, setLoading }: Props): React.JSX.Element => {
   const [formInstance] = Form.useForm();
   const p12Path = Form.useWatch('p12Path', formInstance);
   const csrPath = Form.useWatch('csrPath', formInstance);
-
-  const [loading, setLoading] = useState(false);
   const [advanceOpen, setAdvanceOpen] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const dispatch = useAppDispatch();
@@ -149,13 +145,13 @@ export const CreateCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
     sendCefQuery(queryCfg);
   };
 
-  const handleCancel = (): void => { onCancel(); };
   const toggleAdvance = (): void => { setAdvanceOpen(prev => !prev); };
 
   return (
     <div className={'signForm'}>
       <Form
         form={formInstance}
+        id="cer-form"
         autoComplete={'off'}
         labelCol={{ span: 6 }}
         wrapperCol={{ span: 18 }}
@@ -381,35 +377,6 @@ export const CreateCer = ({ onNext, onCancel }: Props): React.JSX.Element => {
           </div>
         </Form.Item>
 
-        {/* ================= FOOTER ================= */}
-        <div className="footer-section">
-          <div className="help-tooltip">
-            <Popover
-              title={getMessage('uploadProduct.createCer.help.title')}
-              content={getMessage('uploadProduct.createCer.help.content')}
-              trigger="hover"
-              placement="bottomRight"
-            >
-              <span
-                className="help-icon"
-                onClick={(): void => {
-                  sendCefQuery(new CefQueryCfg(EVENT_PUBLISH_APP_HELP));
-                }}
-              >
-                <img className="help-img" src={helpImg} alt="help" />
-              </span>
-            </Popover>
-          </div>
-
-          <div className="button-group">
-            <Button ghost onClick={handleCancel}>
-              {getMessage('uploadProduct.createCer.button.cancel')}
-            </Button>
-            <Button type="primary" loading={loading} htmlType="submit">
-              {getMessage('uploadProduct.createCer.button.next')}
-            </Button>
-          </div>
-        </div>
       </Form>
     </div>
   );
