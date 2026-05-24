@@ -28,8 +28,14 @@ export const CreateCer = ({ onNext, onCancel, setLoading, onFormErrorChange }: P
 
   // 根据主题替换图标
   const theme = useSearchParams('theme');
-  const iconFolder = theme === 'dark' ? iconFolderDark : iconFolderLight;
-  const iconHelp = theme === 'dark' ? iconHelpDark : iconHelpLight;
+  const isDark = theme === 'dark';
+  const themeCssVars = {
+    '--key-sep-text-color': isDark ? '#e6e6e6' : '#595959',
+    '--adv-title-color': isDark ? '#40a9ff' : '#1890ff',
+    '--sep-line-bg': isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)',
+  } as React.CSSProperties;
+  const iconFolder = isDark ? iconFolderDark : iconFolderLight;
+  const iconHelp = isDark ? iconHelpDark : iconHelpLight;
 
   // ── 密码校验规则 ──
   const passwordValidator = (_: any, value: string): Promise<void> => {
@@ -155,7 +161,7 @@ export const CreateCer = ({ onNext, onCancel, setLoading, onFormErrorChange }: P
   const toggleAdvance = (): void => { setAdvanceOpen(prev => !prev); };
 
   return (
-    <div className={'signForm'}>
+    <div className={'signForm'} style={themeCssVars}>
       <Form
         form={formInstance}
         id="cer-form"

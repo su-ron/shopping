@@ -278,14 +278,14 @@
   .key-separator-text {
     font-size: 14px;
     font-weight: 600;
-    color: var(--text-primary-color);
+    color: var(--key-sep-text-color, #e6e6e6);
     white-space: nowrap;
   }
 
   .key-separator-line {
     flex: 1;
     height: 1px;
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--sep-line-bg, rgba(255, 255, 255, 0.3));
   }
 }
 
@@ -314,7 +314,7 @@
     .advance-title {
       font-size: 13px;
       font-weight: 500;
-      color: var(--primary-color, #1890ff);
+      color: var(--adv-title-color, #1890ff);
       white-space: nowrap;
       flex-shrink: 0;
     }
@@ -322,7 +322,7 @@
     .advance-header-line {
       flex: 1;
       height: 1px;
-      background-color: rgba(255, 255, 255, 0.3);
+      background-color: var(--sep-line-bg, rgba(255, 255, 255, 0.3));
     }
   }
 
