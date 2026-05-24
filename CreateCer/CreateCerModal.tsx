@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal } from 'antd';
 import { CreateCer } from './CreateCer';
-import ImportCer from './ImportCer';
+import ImportCer from './CreateCer';
 
 type Props = {
   open: boolean;
