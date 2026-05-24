@@ -275,7 +275,7 @@ export const CreateCer = ({ onNext, onCancel, setLoading, onFormErrorChange }: P
           validateStatus={fieldErrors.keyAlias ? 'error' : undefined}
           help={fieldErrors.keyAlias}
         >
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', marginLeft: -20 }}>
             <Form.Item name={'keyAlias'} noStyle>
               <Input className={'fieldArea'} style={{ marginRight: '6px' }} disabled={false} />
             </Form.Item>
