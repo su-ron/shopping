@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, InputNumber, Popover, message } from 'antd';
 import { getMessage } from '../../../resource/ProjectMgmtBundle';
-import helpDefault from '../../icon/help.png';
 
 import './index.less';
 
@@ -13,7 +12,6 @@ import { FormRow } from './FormRow';
 type Props = { onNext: (cerFilePath: string) => void; onCancel: () => void; setLoading: (v: boolean) => void; onFormErrorChange?: (hasError: boolean) => void; };
 
 export const CreateCer = ({ onNext, onCancel, setLoading, onFormErrorChange }: Props): React.JSX.Element => {
-  const helpImg = helpDefault;
   const [formInstance] = Form.useForm();
   const p12Path = Form.useWatch('p12Path', formInstance);
   const csrPath = Form.useWatch('csrPath', formInstance);
@@ -170,23 +168,6 @@ export const CreateCer = ({ onNext, onCancel, setLoading, onFormErrorChange }: P
           onFormErrorChange?.(Object.keys(errors).length > 0);
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 8 }}>
-          <Popover
-            title={getMessage('uploadProduct.createCer.help.title')}
-            content={getMessage('uploadProduct.createCer.help.content')}
-            trigger="hover"
-            placement="bottomRight"
-          >
-            <span
-              className="help-icon"
-              onClick={(): void => {
-                sendCefQuery(new CefQueryCfg(EVENT_PUBLISH_APP_HELP));
-              }}
-            >
-              <img className="help-img" src={helpImg} alt="help" />
-            </span>
-          </Popover>
-        </div>
         {/* ================= Key store name (*.p12) ================= */}
         <Form.Item label={getMessage('uploadProduct.createCer.label.p12FileName')} labelAlign="left" required
           validateStatus={fieldErrors.p12Name ? 'error' : undefined}
