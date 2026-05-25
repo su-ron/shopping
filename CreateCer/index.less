@@ -48,10 +48,15 @@
   overflow-y: auto;
   min-height: 0;
 
+  /* 收窄 Ant Design Form.Item 的默认行间距 */
+  .ant-form-item {
+    margin-bottom: 12px;
+  }
+
   .form-row {
     display: flex;
     align-items: flex-start;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     gap: 4px;
 
     .form-label {
@@ -272,7 +277,7 @@
 .key-separator {
   display: flex;
   align-items: center;
-  margin: 12px 0;
+  margin: 8px 0;
   gap: 12px;
 
   .key-separator-text {
@@ -298,7 +303,7 @@
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    padding: 8px 0 8px 3ch;
+    padding: 4px 0 4px 3ch;
     user-select: none;
 
     &:hover {
@@ -328,7 +333,7 @@
 
   /* Issue 2: 展开内容与标题对齐缩进3字节 */
   .advance-body {
-    padding: 8px 0 0 3ch;
+    padding: 4px 0 0 3ch;
     border-top: none;
   }
 }
